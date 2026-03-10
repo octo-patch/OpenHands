@@ -86,8 +86,8 @@ describe("AccountSettingsContextMenu", () => {
     expect(screen.getByText("ACCOUNT_SETTINGS$LOGOUT")).toBeInTheDocument();
   });
 
-  it("should render the CTA component", () => {
-    renderWithRouter(
+  it("should render the CTA component in SaaS mode", () => {
+    renderWithSaasConfig(
       <AccountSettingsContextMenu
         onLogout={onLogoutMock}
         onClose={onCloseMock}
@@ -98,8 +98,20 @@ describe("AccountSettingsContextMenu", () => {
     expect(screen.getByText("CTA$LEARN_MORE")).toBeInTheDocument();
   });
 
-  it("should have correct container dimensions", () => {
-    renderWithRouter(
+  it("should not render the CTA component in OSS mode", () => {
+    renderWithOssConfig(
+      <AccountSettingsContextMenu
+        onLogout={onLogoutMock}
+        onClose={onCloseMock}
+      />,
+    );
+
+    expect(screen.queryByText("CTA$ENTERPRISE_TITLE")).not.toBeInTheDocument();
+    expect(screen.queryByText("CTA$LEARN_MORE")).not.toBeInTheDocument();
+  });
+
+  it("should have correct container dimensions in SaaS mode", () => {
+    renderWithSaasConfig(
       <AccountSettingsContextMenu
         onLogout={onLogoutMock}
         onClose={onCloseMock}
@@ -107,14 +119,14 @@ describe("AccountSettingsContextMenu", () => {
     );
 
     const menuContainer = screen.getByTestId("account-settings-context-menu");
-    expect(menuContainer).toHaveClass("w-[600px]");
-    expect(menuContainer).toHaveClass("h-[499px]");
+    expect(menuContainer).toHaveClass("md:w-[600px]");
+    expect(menuContainer).toHaveClass("md:h-[499px]");
     expect(menuContainer).toHaveClass("rounded-[12px]");
     expect(menuContainer).toHaveClass("bg-[#050505]");
   });
 
-  it("should render inner container with two-column layout", () => {
-    renderWithRouter(
+  it("should have auto dimensions in OSS mode", () => {
+    renderWithOssConfig(
       <AccountSettingsContextMenu
         onLogout={onLogoutMock}
         onClose={onCloseMock}
@@ -122,7 +134,22 @@ describe("AccountSettingsContextMenu", () => {
     );
 
     const menuContainer = screen.getByTestId("account-settings-context-menu");
-    const innerContainer = menuContainer.querySelector(".w-\\[550px\\].h-\\[449px\\]");
+    expect(menuContainer).toHaveClass("w-auto");
+    expect(menuContainer).toHaveClass("h-auto");
+    expect(menuContainer).toHaveClass("rounded-[12px]");
+    expect(menuContainer).toHaveClass("bg-[#050505]");
+  });
+
+  it("should render inner container with two-column layout in SaaS mode", () => {
+    renderWithSaasConfig(
+      <AccountSettingsContextMenu
+        onLogout={onLogoutMock}
+        onClose={onCloseMock}
+      />,
+    );
+
+    const menuContainer = screen.getByTestId("account-settings-context-menu");
+    const innerContainer = menuContainer.querySelector(".md\\:w-\\[550px\\].md\\:h-\\[449px\\]");
     expect(innerContainer).toBeInTheDocument();
     expect(innerContainer).toHaveClass("flex");
     expect(innerContainer).toHaveClass("flex-row");

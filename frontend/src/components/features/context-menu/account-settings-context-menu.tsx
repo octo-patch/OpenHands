@@ -2,6 +2,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { useFeatureFlagEnabled } from "posthog-js/react";
+import { cn } from "#/utils/utils";
 import { ContextMenu } from "#/ui/context-menu";
 import { ContextMenuListItem } from "./context-menu-list-item";
 import { ContextMenuCTA } from "./context-menu-cta";
@@ -59,14 +60,35 @@ export function AccountSettingsContextMenu({
     <div
       ref={ref}
       data-testid="account-settings-context-menu"
-      className="absolute w-[600px] h-[499px] rounded-[12px] border border-[#242424] bg-[#050505] text-white overflow-hidden z-[9999] context-menu-box-shadow mt-2 right-0 md:right-full md:left-full md:bottom-0 ml-0 p-[25px]"
+      className={cn(
+        "absolute rounded-[12px]",
+        "border border-[#242424] bg-[#050505]",
+        "text-white overflow-hidden z-[9999]",
+        "context-menu-box-shadow mt-2 right-0",
+        "md:right-full md:left-full md:bottom-0",
+        "ml-0 p-[25px]",
+        isSaasMode
+          ? "w-auto h-auto md:w-[600px] md:h-[499px]"
+          : "w-auto h-auto",
+      )}
     >
       {/* Inner container wrapping both columns */}
-      <div className="w-[550px] h-[449px] rounded-[12px] flex flex-row">
+      <div
+        className={cn(
+          "rounded-[12px] flex flex-row gap-4",
+          isSaasMode
+            ? "w-auto h-auto md:w-[550px] md:h-[449px]"
+            : "w-auto h-auto",
+        )}
+      >
         {/* Left column - Settings list */}
         <ContextMenu
           testId="account-settings-menu-list"
-          className="relative !bg-transparent !shadow-none !rounded-none border-none p-0 m-0 w-[264px] [box-shadow:none]"
+          className={cn(
+            "relative !bg-transparent !shadow-none !rounded-none",
+            "border-none p-0 m-0 [box-shadow:none]",
+            isSaasMode && "md:w-[264px]",
+          )}
         >
           {showAddTeamMembers && (
             <ContextMenuListItem
@@ -122,8 +144,12 @@ export function AccountSettingsContextMenu({
           </ContextMenuListItem>
         </ContextMenu>
 
-        {/* Right column - CTA */}
-        <ContextMenuCTA />
+        {/* Right column - CTA (SaaS only, hidden on mobile) */}
+        {isSaasMode && (
+          <div className="hidden md:block">
+            <ContextMenuCTA />
+          </div>
+        )}
       </div>
     </div>
   );
