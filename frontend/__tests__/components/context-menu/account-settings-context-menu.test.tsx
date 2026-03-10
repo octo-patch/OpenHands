@@ -148,11 +148,11 @@ describe("AccountSettingsContextMenu", () => {
       />,
     );
 
-    const menuContainer = screen.getByTestId("account-settings-context-menu");
-    const innerContainer = menuContainer.querySelector(".md\\:w-\\[550px\\].md\\:h-\\[449px\\]");
+    const innerContainer = screen.getByTestId("account-settings-inner-container");
     expect(innerContainer).toBeInTheDocument();
     expect(innerContainer).toHaveClass("flex");
     expect(innerContainer).toHaveClass("flex-row");
+    expect(innerContainer).toHaveClass("gap-4");
   });
 
   it("should render Documentation link with correct attributes", () => {

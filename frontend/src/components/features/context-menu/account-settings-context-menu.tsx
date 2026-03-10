@@ -74,6 +74,7 @@ export function AccountSettingsContextMenu({
     >
       {/* Inner container wrapping both columns */}
       <div
+        data-testid="account-settings-inner-container"
         className={cn(
           "rounded-[12px] flex flex-row gap-4",
           isSaasMode
