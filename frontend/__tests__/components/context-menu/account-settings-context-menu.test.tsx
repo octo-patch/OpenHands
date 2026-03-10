@@ -94,6 +94,7 @@ describe("AccountSettingsContextMenu", () => {
       />,
     );
 
+    expect(screen.getByTestId("context-menu-cta")).toBeInTheDocument();
     expect(screen.getByText("CTA$ENTERPRISE_TITLE")).toBeInTheDocument();
     expect(screen.getByText("CTA$LEARN_MORE")).toBeInTheDocument();
   });
@@ -106,11 +107,12 @@ describe("AccountSettingsContextMenu", () => {
       />,
     );
 
+    expect(screen.queryByTestId("context-menu-cta")).not.toBeInTheDocument();
     expect(screen.queryByText("CTA$ENTERPRISE_TITLE")).not.toBeInTheDocument();
     expect(screen.queryByText("CTA$LEARN_MORE")).not.toBeInTheDocument();
   });
 
-  it("should have correct container dimensions in SaaS mode", () => {
+  it("should use responsive classes in SaaS mode (md: for desktop)", () => {
     renderWithSaasConfig(
       <AccountSettingsContextMenu
         onLogout={onLogoutMock}
@@ -119,13 +121,13 @@ describe("AccountSettingsContextMenu", () => {
     );
 
     const menuContainer = screen.getByTestId("account-settings-context-menu");
+    // Desktop styles should use md: prefix (applied on screens >= 768px)
     expect(menuContainer).toHaveClass("md:w-[600px]");
     expect(menuContainer).toHaveClass("md:h-[499px]");
-    expect(menuContainer).toHaveClass("rounded-[12px]");
-    expect(menuContainer).toHaveClass("bg-[#050505]");
+    expect(menuContainer).toHaveClass("md:bg-[#050505]");
   });
 
-  it("should have auto dimensions in OSS mode", () => {
+  it("should not use responsive desktop classes in OSS mode", () => {
     renderWithOssConfig(
       <AccountSettingsContextMenu
         onLogout={onLogoutMock}
@@ -134,10 +136,9 @@ describe("AccountSettingsContextMenu", () => {
     );
 
     const menuContainer = screen.getByTestId("account-settings-context-menu");
-    expect(menuContainer).toHaveClass("w-auto");
-    expect(menuContainer).toHaveClass("h-auto");
-    expect(menuContainer).toHaveClass("rounded-[12px]");
-    expect(menuContainer).toHaveClass("bg-[#050505]");
+    // OSS mode should not have desktop-specific classes
+    expect(menuContainer).not.toHaveClass("md:w-[600px]");
+    expect(menuContainer).not.toHaveClass("md:h-[499px]");
   });
 
   it("should render inner container with two-column layout in SaaS mode", () => {

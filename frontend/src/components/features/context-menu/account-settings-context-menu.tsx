@@ -61,25 +61,22 @@ export function AccountSettingsContextMenu({
       ref={ref}
       data-testid="account-settings-context-menu"
       className={cn(
-        "absolute rounded-[12px]",
-        "border border-[#242424] bg-[#050505]",
-        "text-white overflow-hidden z-[9999]",
+        "absolute text-white overflow-hidden z-[9999]",
         "context-menu-box-shadow mt-2 right-0",
-        "md:right-full md:left-full md:bottom-0",
-        "ml-0 p-[25px]",
-        isSaasMode
-          ? "w-auto h-auto md:w-[600px] md:h-[499px]"
-          : "w-auto h-auto",
+        "md:right-full md:left-full md:bottom-0 ml-0",
+        // Mobile: match production styling
+        "bg-tertiary rounded-[6px] py-[6px] px-1",
+        // Desktop (SaaS): CTA container styling
+        isSaasMode &&
+          "md:rounded-[12px] md:border md:border-[#242424] md:bg-[#050505] md:p-[25px] md:w-[600px] md:h-[499px]",
       )}
     >
       {/* Inner container wrapping both columns */}
       <div
         data-testid="account-settings-inner-container"
         className={cn(
-          "rounded-[12px] flex flex-row gap-4",
-          isSaasMode
-            ? "w-auto h-auto md:w-[550px] md:h-[449px]"
-            : "w-auto h-auto",
+          "flex flex-row gap-4",
+          isSaasMode && "md:w-[550px] md:h-[449px]",
         )}
       >
         {/* Left column - Settings list */}
