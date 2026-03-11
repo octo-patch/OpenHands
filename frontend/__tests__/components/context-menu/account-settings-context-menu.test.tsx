@@ -20,8 +20,14 @@ vi.mock("posthog-js/react", () => ({
   useFeatureFlagEnabled: vi.fn(),
 }));
 
-// Import the mocked module to get access to the mock
+// Mock useBreakpoint hook
+vi.mock("#/hooks/use-breakpoint", () => ({
+  useBreakpoint: vi.fn(),
+}));
+
+// Import the mocked modules to get access to the mocks
 import * as posthog from "posthog-js/react";
+import * as breakpoint from "#/hooks/use-breakpoint";
 
 describe("AccountSettingsContextMenu", () => {
   const user = userEvent.setup();
@@ -37,6 +43,8 @@ describe("AccountSettingsContextMenu", () => {
     });
     // Set default feature flag to false
     vi.mocked(posthog.useFeatureFlagEnabled).mockReturnValue(false);
+    // Default to desktop (not mobile)
+    vi.mocked(breakpoint.useBreakpoint).mockReturnValue(false);
   });
 
   // Create a wrapper with MemoryRouter and renderWithProviders
@@ -69,6 +77,7 @@ describe("AccountSettingsContextMenu", () => {
     onCloseMock.mockClear();
     mockTrackAddTeamMembersButtonClick.mockClear();
     vi.mocked(posthog.useFeatureFlagEnabled).mockClear();
+    vi.mocked(breakpoint.useBreakpoint).mockClear();
   });
 
   it("should always render the right options", () => {
@@ -86,7 +95,9 @@ describe("AccountSettingsContextMenu", () => {
     expect(screen.getByText("ACCOUNT_SETTINGS$LOGOUT")).toBeInTheDocument();
   });
 
-  it("should render the CTA component in SaaS mode", () => {
+  it("should render the CTA component in SaaS desktop mode", () => {
+    // Desktop mode (not mobile)
+    vi.mocked(breakpoint.useBreakpoint).mockReturnValue(false);
     renderWithSaasConfig(
       <AccountSettingsContextMenu
         onLogout={onLogoutMock}
@@ -97,6 +108,21 @@ describe("AccountSettingsContextMenu", () => {
     expect(screen.getByTestId("context-menu-cta")).toBeInTheDocument();
     expect(screen.getByText("CTA$ENTERPRISE_TITLE")).toBeInTheDocument();
     expect(screen.getByText("CTA$LEARN_MORE")).toBeInTheDocument();
+  });
+
+  it("should not render the CTA component in SaaS mobile mode", () => {
+    // Mobile mode
+    vi.mocked(breakpoint.useBreakpoint).mockReturnValue(true);
+    renderWithSaasConfig(
+      <AccountSettingsContextMenu
+        onLogout={onLogoutMock}
+        onClose={onCloseMock}
+      />,
+    );
+
+    expect(screen.queryByTestId("context-menu-cta")).not.toBeInTheDocument();
+    expect(screen.queryByText("CTA$ENTERPRISE_TITLE")).not.toBeInTheDocument();
+    expect(screen.queryByText("CTA$LEARN_MORE")).not.toBeInTheDocument();
   });
 
   it("should not render the CTA component in OSS mode", () => {
@@ -112,48 +138,35 @@ describe("AccountSettingsContextMenu", () => {
     expect(screen.queryByText("CTA$LEARN_MORE")).not.toBeInTheDocument();
   });
 
-  it("should use responsive classes in SaaS mode (md: for desktop)", () => {
-    renderWithSaasConfig(
+  it("should have consistent base styling in SaaS and OSS modes", () => {
+    // Test SaaS mode
+    const { unmount } = renderWithSaasConfig(
       <AccountSettingsContextMenu
         onLogout={onLogoutMock}
         onClose={onCloseMock}
       />,
     );
+    const saasContainer = screen.getByTestId("account-settings-context-menu");
+    expect(saasContainer).toHaveClass("bg-[#050505]");
+    expect(saasContainer).toHaveClass("border");
+    expect(saasContainer).toHaveClass("border-[#242424]");
+    expect(saasContainer).toHaveClass("rounded-[12px]");
+    expect(saasContainer).toHaveClass("p-[25px]");
+    unmount();
 
-    const menuContainer = screen.getByTestId("account-settings-context-menu");
-    // Desktop styles should use md: prefix (applied on screens >= 768px)
-    expect(menuContainer).toHaveClass("md:w-[600px]");
-    expect(menuContainer).toHaveClass("md:h-[499px]");
-    expect(menuContainer).toHaveClass("md:bg-[#050505]");
-  });
-
-  it("should not use responsive desktop classes in OSS mode", () => {
+    // Test OSS mode
     renderWithOssConfig(
       <AccountSettingsContextMenu
         onLogout={onLogoutMock}
         onClose={onCloseMock}
       />,
     );
-
-    const menuContainer = screen.getByTestId("account-settings-context-menu");
-    // OSS mode should not have desktop-specific classes
-    expect(menuContainer).not.toHaveClass("md:w-[600px]");
-    expect(menuContainer).not.toHaveClass("md:h-[499px]");
-  });
-
-  it("should render inner container with two-column layout in SaaS mode", () => {
-    renderWithSaasConfig(
-      <AccountSettingsContextMenu
-        onLogout={onLogoutMock}
-        onClose={onCloseMock}
-      />,
-    );
-
-    const innerContainer = screen.getByTestId("account-settings-inner-container");
-    expect(innerContainer).toBeInTheDocument();
-    expect(innerContainer).toHaveClass("flex");
-    expect(innerContainer).toHaveClass("flex-row");
-    expect(innerContainer).toHaveClass("gap-4");
+    const ossContainer = screen.getByTestId("account-settings-context-menu");
+    expect(ossContainer).toHaveClass("bg-[#050505]");
+    expect(ossContainer).toHaveClass("border");
+    expect(ossContainer).toHaveClass("border-[#242424]");
+    expect(ossContainer).toHaveClass("rounded-[12px]");
+    expect(ossContainer).toHaveClass("p-[25px]");
   });
 
   it("should render Documentation link with correct attributes", () => {
