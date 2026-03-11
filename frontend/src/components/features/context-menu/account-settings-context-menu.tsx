@@ -62,27 +62,27 @@ export function AccountSettingsContextMenu({
       data-testid="account-settings-context-menu"
       className={cn(
         "absolute text-white overflow-hidden z-[9999]",
-        "context-menu-box-shadow mt-2 right-0",
-        "md:right-full md:left-full md:bottom-0 ml-0",
-        // Mobile: match production styling
+        "context-menu-box-shadow ml-0",
+        "right-0",
+        "md:right-auto md:left-full md:bottom-0",
         "bg-tertiary rounded-[6px] py-[6px] px-1",
-        // Desktop (SaaS): CTA container styling
+        // desktop CTA / expanded container styling
         isSaasMode &&
           "md:rounded-[12px] md:border md:border-[#242424] md:bg-[#050505] md:p-[25px] md:w-[600px] md:h-[499px]",
       )}
     >
-      {/* Inner container wrapping both columns */}
+      {/* Inner container */}
       <div
         data-testid="account-settings-inner-container"
         className={cn(
-          "flex flex-row gap-4",
-          isSaasMode && "md:w-[550px] md:h-[449px]",
+          isSaasMode && "flex flex-row gap-4 md:w-[550px] md:h-[449px]",
         )}
       >
         {/* Left column - Settings list */}
         <ContextMenu
           testId="account-settings-menu-list"
           className={cn(
+            // Override default ContextMenu styles when nested
             "relative !bg-transparent !shadow-none !rounded-none",
             "border-none p-0 m-0 [box-shadow:none]",
             isSaasMode && "md:w-[264px]",
