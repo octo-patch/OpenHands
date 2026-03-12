@@ -66,7 +66,8 @@ export function AccountSettingsContextMenu({
     >
       <ContextMenu
         testId="account-settings-menu-list"
-        className="relative !bg-transparent !shadow-none !rounded-none border-none p-0 m-0 [box-shadow:none]"
+        theme="naked"
+        spacing="none"
       >
         {showAddTeamMembers && (
           <ContextMenuListItem
